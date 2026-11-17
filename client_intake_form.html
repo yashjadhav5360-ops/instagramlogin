@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Client Intake Form</title>
+<style>
+  :root {
+    --bg: #eef0f4;
+    --card-bg: #ffffff;
+    --text: #1b1d29;
+    --text-muted: #686d7d;
+    --accent: #4f46e5;
+    --accent-hover: #4038c7;
+    --border: #e1e3ea;
+    --error: #d6336c;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    padding: 32px 16px;
+    color: var(--text);
+  }
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 36px 30px;
+    width: 100%;
+    max-width: 380px;
+    box-shadow: 0 14px 34px rgba(20, 20, 40, 0.08);
+  }
+  .logo {
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--accent), #ff6fa5);
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: white;
+    font-size: 19px;
+  }
+  h1 { font-size: 21px; text-align: center; margin: 0 0 6px; }
+  .subtitle { text-align: center; color: var(--text-muted); font-size: 13px; margin: 0 0 26px; }
+  label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+  .field { margin-bottom: 16px; }
+  input[type="text"], input[type="tel"] {
+    width: 100%;
+    padding: 11px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    outline: none;
+  }
+  input:focus { border-color: var(--accent); }
+  input.invalid { border-color: var(--error); }
+  .error-msg { color: var(--error); font-size: 12px; margin-top: 5px; min-height: 14px; }
+  button.submit {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    background: var(--accent);
+    color: white;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  button.submit:hover { background: var(--accent-hover); }
+  .success {
+    margin-top: 16px;
+    padding: 10px;
+    border-radius: 10px;
+    background: rgba(79,70,229,0.12);
+    color: var(--accent);
+    font-size: 13px;
+    text-align: center;
+    display: none;
+  }
+  .footer-text { text-align: center; font-size: 12px; color: var(--text-muted); margin-top: 22px; }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="logo">C</div>
+  <h1>New Client Details</h1>
+  <p class="subtitle">Enter the client's name and phone number</p>
+
+  <!--
+    IMPORTANT: Replace YOUR_FORM_ID below with your real Formspree endpoint.
+    1. Go to https://formspree.io and sign up (free)
+    2. Create a new form, it gives you a URL like:
+       https://formspree.io/f/abcd1234
+    3. Paste that URL into the action="" attribute below
+  -->
+  <form id="intakeForm" action="https://formspree.io/f/YOUR_FORM_ID" method="POST" novalidate>
+    <div class="field">
+      <label for="name">Client Name</label>
+      <input type="text" id="name" name="name" placeholder="Full name">
+      <div class="error-msg" id="nameError"></div>
+    </div>
+
+    <div class="field">
+      <label for="phone">Phone Number</label>
+      <input type="tel" id="phone" name="phone" placeholder="10-digit number">
+      <div class="error-msg" id="phoneError"></div>
+    </div>
+
+    <button type="submit" class="submit">Save Client</button>
+
+    <div class="success" id="successMsg">Saved. You'll get the details on your email.</div>
+  </form>
+
+  <p class="footer-text">Details are sent only to your own Formspree inbox.</p>
+</div>
+
+<script>
+  const form = document.getElementById('intakeForm');
+  const nameInput = document.getElementById('name');
+  const phoneInput = document.getElementById('phone');
+  const nameError = document.getElementById('nameError');
+  const phoneError = document.getElementById('phoneError');
+  const successMsg = document.getElementById('successMsg');
+
+  function isValidPhone(value) {
+    return /^[0-9]{10}$/.test(value.replace(/\s+/g, ''));
+  }
+
+  form.addEventListener('submit', (e) => {
+    let valid = true;
+    successMsg.style.display = 'none';
+
+    nameInput.classList.remove('invalid');
+    nameError.textContent = '';
+    if (!nameInput.value.trim()) {
+      nameError.textContent = 'Name is required.';
+      nameInput.classList.add('invalid');
+      valid = false;
+    }
+
+    phoneInput.classList.remove('invalid');
+    phoneError.textContent = '';
+    if (!phoneInput.value.trim()) {
+      phoneError.textContent = 'Phone number is required.';
+      phoneInput.classList.add('invalid');
+      valid = false;
+    } else if (!isValidPhone(phoneInput.value.trim())) {
+      phoneError.textContent = 'Enter a valid 10-digit number.';
+      phoneInput.classList.add('invalid');
+      valid = false;
+    }
+
+    if (!valid) {
+      e.preventDefault();
+    }
+    // if valid, form submits normally to the Formspree action URL
+  });
+</script>
+
+</body>
+</html>
